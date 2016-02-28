@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     cout << "Neumann L., Matas J.: Real-Time Scene Text Localization and Recognition, CVPR 2012" << endl << endl;
     Mat image;
     #ifdef VIDEO
-        VideoCapture cap("/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"); // open the default camera
+        VideoCapture cap("/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"); //videoplayback_ROI
     #endif
         int i=0;
     while(1)
@@ -65,19 +65,23 @@ int main(int argc, char* argv[])
         cout<<"Frame Rate: "<<cap.get(CAP_PROP_FPS)<<endl;
         cout<<"Frame: "<<i<<"/"<<cap.get(CAP_PROP_FRAME_COUNT)<<endl;
         i++;
-        double maxFrameCount=(cap.get(CAP_PROP_FRAME_COUNT));
-        if(i>=maxFrameCount)
+        double maxFrameCount=cap.get(CAP_PROP_FRAME_COUNT);
+        //double imageWidth=cap.get(CAP_PROP_FRAME_WIDTH);
+        //double imageHeight=cap.get(CAP_PROP_FRAME_HEIGHT);
+        
+        if(i>=maxFrameCount)//maxFrameCount  processing only stable part of video
             break;
         cap>>image ;// get a new frame from camera
-        if(i%2!=0)
+        if(i%5!=0)
             continue;
-        
-        //GaussianBlur(image, image, Size(0, 0), 3);
-
+        image=image(Rect(0,120,1280,400)); //cropping image to ROI for Original Video
+        //Mat frame;
+        //GaussianBlur(image, frame, Size(0, 0), 3);
+        //addWeighted(image,2, frame, -1, 0, image);
         cout<<"Getting new frame"<<endl;
 #endif
-        cout << "IMG_W=" << image.cols << endl;
-        cout << "IMG_H=" << image.rows << endl;
+        cout << "IMG_W=" << image.cols << endl;//1280
+        cout << "IMG_H=" << image.rows << endl;//720
 
         /*Text Detection*/
 
