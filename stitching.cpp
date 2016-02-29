@@ -49,6 +49,9 @@
 
 using namespace std;
 using namespace cv;
+#define VIDEO_PATH "/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"
+#define Nth_FRAME 2
+#define NUM_IMAGE_IN_PANO 5
 
 bool try_use_gpu = false;
 vector<Mat> imgs;
@@ -63,7 +66,7 @@ int main(int argc, char* argv[])
     int i=0,j=0;
     
     cout<<"Reading video"<<endl;
-    VideoCapture cap("/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"); //videoplayback_ROI
+    VideoCapture cap(VIDEO_PATH); //videoplayback_ROI
     if(!cap.isOpened())  // check if we succeeded
        {
            cout<<"Unable to find video file or it is opened in some application"<<endl;
@@ -80,15 +83,14 @@ int main(int argc, char* argv[])
             break;
         Mat img;
         cap>>img; 
-        //if(i%3!=0)
+        //if(i%Nth_FRAME!=0)
         //    continue; 
         img=img(Rect(0,120,1280,400));
         imgs.push_back(img);
-        //j+=1;
-        if(imgs.size()==5)
+      
+        if(imgs.size()==NUM_IMAGE_IN_PANO)
         {
-            //if (retval) return -1;
-            //j=0;
+          
             namedWindow("Image 1",WINDOW_NORMAL);
             imshow("Image 1",imgs[0]);
             namedWindow("Image 2",WINDOW_NORMAL);
@@ -97,6 +99,8 @@ int main(int argc, char* argv[])
             imshow("Image 3",imgs[2]);
             namedWindow("Image 4",WINDOW_NORMAL);
             imshow("Image 4",imgs[3]);
+            namedWindow("Image 5",WINDOW_NORMAL);
+            imshow("Image 5",imgs[4]);
             
             //char c=cvWaitKey(0);
             //if(c==27)
@@ -110,6 +114,7 @@ int main(int argc, char* argv[])
                 cout << "Can't stitch images, error code = " << int(status) << endl;
                 //return -1;
                 imgs.clear();
+                vector<Mat>().swap(imgs);//clear from memory
                 continue;
             }
             namedWindow("panorama",WINDOW_NORMAL);
@@ -121,6 +126,7 @@ int main(int argc, char* argv[])
             //cvDestroyWindow("panorama");
             //imwrite(result_name, pano);
             imgs.clear();
+            vector<Mat>().swap(imgs);  //to clear from memory
             cout<<"Capacity of the Vector now is: "<<imgs.capacity()<<endl;
         }
         
