@@ -18,8 +18,8 @@
 
 
 #include <iostream>
-#define VIDEO 
-
+//#define VIDEO 
+//#define DEBUG
 using namespace std;
 using namespace cv;
 using namespace cv::text;
@@ -41,12 +41,17 @@ int main(int argc, char* argv[])
     cout << "Neumann L., Matas J.: Real-Time Scene Text Localization and Recognition, CVPR 2012" << endl << endl;
     Mat image;
     #ifdef VIDEO
-        VideoCapture cap("/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"); //videoplayback_ROI
+        VideoCapture cap("./videoSamples-26th-march-2016/vid010.mp4"); //videoplayback_ROI
     #endif
-        int i=0;
+    int i=0;
+    int imgCount=1;
+    char imageSets[50];
+
     while(1)
     {
     #ifndef VIDEO
+#ifdef DEBUG
+        /*
         if(argc>1)
             image  = imread(argv[1]);
         else
@@ -54,6 +59,18 @@ int main(int argc, char* argv[])
             cout << "    Usage: " << argv[0] << " <input_image> [<gt_word1> ... <gt_wordN>]" << endl;
             return(0);
         }
+        */
+        sprintf(imageSets,"./videoSamples-26th-march-2016/imgSet001/img%03d.jpg",30);
+        image= imread(imageSets ,1);
+   
+#else
+    sprintf(imageSets,"./videoSamples-26th-march-2016/imgSet012/img%03d.jpg",imgCount);
+    image= imread(imageSets ,1);
+    if(!image.data ) break;
+    imgCount++;
+
+#endif
+        
     #endif
     #ifdef VIDEO
        
@@ -72,9 +89,9 @@ int main(int argc, char* argv[])
         if(i>=maxFrameCount)//maxFrameCount  processing only stable part of video
             break;
         cap>>image ;// get a new frame from camera
-        if(i%5!=0)
+        if(i%10!=0)
             continue;
-        image=image(Rect(0,120,1280,400)); //cropping image to ROI for Original Video
+        //image=image(Rect(0,280,image.cols,400)); //cropping image to ROI for Original Video
         //Mat frame;
         //GaussianBlur(image, frame, Size(0, 0), 3);
         //addWeighted(image,2, frame, -1, 0, image);
@@ -82,7 +99,10 @@ int main(int argc, char* argv[])
 #endif
         cout << "IMG_W=" << image.cols << endl;//1280
         cout << "IMG_H=" << image.rows << endl;//720
-
+        
+        //imgset4 and 5 0 295 1280 400
+        image=image(Rect(0,295,1280,400)); //cropping image to ROI for Original Video
+        
         /*Text Detection*/
 
         // Extract channels to be processed individually
@@ -147,7 +167,7 @@ int main(int argc, char* argv[])
         image.copyTo(out_img);
         image.copyTo(out_img_detection);
         float scale_img  = 600.f/image.rows;
-        float scale_font = (float)(2-scale_img)/1.4f;
+        float scale_font = (float)(3-scale_img)/1.4f;
         vector<string> words_detection;
 
         t_r = (double)getTickCount();
@@ -302,18 +322,25 @@ int main(int argc, char* argv[])
         //imshow("detection", out_img_detection);
         //imwrite("detection.jpg", out_img_detection);
         //resize(out_img,out_img,Size(image.cols*scale_img,image.rows*scale_img));
-
+    #ifdef DEBUG
         namedWindow("recognition",WINDOW_NORMAL);
         imshow("recognition", out_img);
-        
-        //imwrite("recognition.jpg", out_img);
+    #endif
+    #ifndef DEBUG
+        imwrite(strcat(imageSets,"_out"), out_img);
+    #endif
         //imwrite("segmentation.jpg", out_img_segmentation);
         //imwrite("decomposition.jpg", out_img_decomposition);
 
     #ifndef VIDEO
+    #ifdef DEBUG
+        
         waitKey(0);
 
         break;
+    #else
+        
+    #endif
     #endif
     #ifdef VIDEO
         char c=waitKey(0);

@@ -1,4 +1,4 @@
-/*M/////0//////////////////////////////////////////////////////////////////////////////////
+/*M///////////////////////////////////////////////////////////////////////////////////////
 //
 //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
 //
@@ -49,17 +49,21 @@
 
 using namespace std;
 using namespace cv;
-#define VIDEO_PATH "/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv1.mp4"
+ 
+//OCR-Analysisv1
+
+#define VIDEO_PATH "/home/vishwanathan/Dropbox/Sem4/EE692-RnD Project/Sample Videos/OCR-Analysisv2.mp4" 
 #define Nth_FRAME 2
-#define NUM_IMAGE_IN_PANO 5
+#define NUM_IMAGE_IN_PANO 4
 
 bool try_use_gpu = false;
 vector<Mat> imgs;
+vector<Mat> dummy;
 string result_name = "result.jpg";
-
+/*
 void printUsage();
 int parseCmdArgs(int argc, char** argv);
-
+*/
 int main(int argc, char* argv[])
 {
     //int retval = parseCmdArgs(argc, argv);
@@ -74,6 +78,8 @@ int main(int argc, char* argv[])
        }
     double maxFrameCount=cap.get(CAP_PROP_FRAME_COUNT);
     cout<<"Total frame count: "<<maxFrameCount<<endl;
+    Mat img;
+    Mat pano;
     while(1)
     {
         i+=1;
@@ -81,13 +87,14 @@ int main(int argc, char* argv[])
         
         if(i>=maxFrameCount)//maxFrameCount  processing only stable part of video
             break;
-        Mat img;
+       
         cap>>img; 
-        //if(i%Nth_FRAME!=0)
-        //    continue; 
-        img=img(Rect(0,120,1280,400));
+        if(i%Nth_FRAME!=0)
+            continue; 
+        //img=img(Rect(0,120,1280,400));
+        img=img(Rect(0,300,1280,400));
         imgs.push_back(img);
-      
+        //img.release();
         if(imgs.size()==NUM_IMAGE_IN_PANO)
         {
           
@@ -99,14 +106,14 @@ int main(int argc, char* argv[])
             imshow("Image 3",imgs[2]);
             namedWindow("Image 4",WINDOW_NORMAL);
             imshow("Image 4",imgs[3]);
-            namedWindow("Image 5",WINDOW_NORMAL);
-            imshow("Image 5",imgs[4]);
+            //namedWindow("Image 5",WINDOW_NORMAL);
+            //imshow("Image 5",imgs[4]);
             
             //char c=cvWaitKey(0);
             //if(c==27)
             //    break;
                 
-            Mat pano;
+            
             Stitcher stitcher = Stitcher::createDefault(try_use_gpu);
             Stitcher::Status status = stitcher.stitch(imgs, pano);
             if (status != Stitcher::OK)
@@ -114,7 +121,7 @@ int main(int argc, char* argv[])
                 cout << "Can't stitch images, error code = " << int(status) << endl;
                 //return -1;
                 imgs.clear();
-                vector<Mat>().swap(imgs);//clear from memory
+                dummy.swap(imgs);//clear from memory
                 continue;
             }
             namedWindow("panorama",WINDOW_NORMAL);
@@ -122,11 +129,11 @@ int main(int argc, char* argv[])
             char c=cvWaitKey(0);
             if(c==27)
                 break;
-            
+            pano.release();
             //cvDestroyWindow("panorama");
             //imwrite(result_name, pano);
             imgs.clear();
-            vector<Mat>().swap(imgs);  //to clear from memory
+            dummy.swap(imgs);  //to clear from memory
             cout<<"Capacity of the Vector now is: "<<imgs.capacity()<<endl;
         }
         
@@ -135,7 +142,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-
+/*
 void printUsage()
 {
     cout <<
@@ -195,3 +202,4 @@ int parseCmdArgs(int argc, char** argv)
     }
     return 0;
 }
+*/
